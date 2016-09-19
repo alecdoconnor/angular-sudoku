@@ -34,8 +34,12 @@ app.controller('sudokuController', function($scope, $http) {
     function (response) {
       $scope.puzzle = response.data;
       $scope.checkLegalEntries = function() {
-
+        
       };
+      $scope.checkLegalEntries = function() {
+        
+      };
+      
     });
 });
 </script>
