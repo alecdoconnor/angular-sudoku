@@ -10,6 +10,7 @@ error_reporting(E_ALL);
 //Create a class for the data to be stored for each individual cell
 class Piece {
   public $editable;
+  public $inEdit;
   public $row;
   public $column;
   public $value;
@@ -21,6 +22,7 @@ class Piece {
     else {
       $this->editable = true;
     }
+    $this->inEdit = false;
     $this->row = $row;
     $this->column = $column;
     $this->value = $value;
