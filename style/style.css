@@ -1,0 +1,62 @@
+body {
+  bbackground: linear-gradient(to bottom right, #0FBA8D,#1FC8DB,#3BA1C1);
+  background: linear-gradient(to bottom right, #87E0FD 0%,#53CBF1 40%,#05ABE0 100%);
+}
+
+#puzzle {
+  margin: auto;
+  width:472px;
+  height:472px;
+  border: solid 1px;
+  background-color: #FFF;
+}
+.column {
+  width: 50px;
+  height: 50px;
+  float:left;
+}
+.clear {
+  clear: both;
+  width: 0;
+  height: 0;
+}
+
+.column {
+  border: solid 1px;
+}
+.column:nth-child(3n+1) {
+  border-left: solid 2px;
+}
+.row:nth-child(3n+1) {
+  border-top: solid 1px;
+}
+.column:nth-child(9) {
+  border-right: solid 2px;
+}
+.row:nth-child(9) {
+  border-bottom: solid 1px;
+}
+
+.column {
+  font-size: 30px;
+  text-align:center;
+  line-height:50px;
+  padding:auto;
+}
+
+h1, h3 {
+  width: 600px;
+  text-align:center;
+  margin:30px auto;
+  color: #2F5B85;
+}
+#intro {
+  margin:60px;
+}
+#rules {
+  width: 600px;
+  margin: 60px auto;
+}
+#rules p:last-child {
+  font-weight: bold;
+}
