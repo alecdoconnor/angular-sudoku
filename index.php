@@ -14,7 +14,7 @@
 
 <div id="puzzle" ng-app="sudoku" ng-controller="sudokuController">
   <div class="row" ng-repeat="y in puzzle">
-    <div class="column" ng-repeat="x in y" ng-click="x.inEdit = true;">
+    <div class="column  R{{x.row}} C{{x.column}}  B{{((x.column)+1)/3 | number:0}}{{((x.row)+1)/3 | number:0}}" ng-repeat="x in y" ng-click="x.inEdit = true;">
     	<!--static cell-->
     	<span ng-if="!x.editable" style="font-weight:bold;">{{x.value}}</span>
     	<!--dynamic cell-->
@@ -24,7 +24,6 @@
     	<span ng-if="x.editable" ng-hide="x.value == 0 || x.inEdit" ng-bind="x.value" style="color:#2F5B85"></span>
     	<!--Show input cell when activated (clicked on and in focus)-->
     	<input ng-if="x.editable"
-    	type="number"
     	style="width: 50px; height: 50px;"
     	ng-model="x.value"
     	ng-show="x.inEdit"
@@ -35,6 +34,9 @@
     </div>
     <div class="clear"></div>
   </div>
+  {{angular.forEach(illegals, function(illegal) {
+    <style ng-repeat="cell in cellRanges | filter:illegal" >.{{cell}} {background-color:#FFEAE9;}</style>
+});}}
 </div>
 
 <div id="rules">
@@ -50,6 +52,11 @@ app.controller('sudokuController', function($scope, $http) {
     $http.get("generator.php").then(
     function (response) {
       $scope.puzzle = response.data;
+      $scope.illegals = [];
+      //Normally I would not recommend hard-coding, but running a loop for this would be more trouble than needed
+      $scope.cellRanges = ["R1","R2","R3","R4","R5","R6","R7","R8","R9",
+                           "C1","C2","C3","C4","C5","C6","C7","C8","C9",
+                           "B11","B12","B13","B21","B22","B23","B31","B32","B33"];
       
       $scope.selectInput = function($event) {
       	$event.target.select();
@@ -173,6 +180,7 @@ app.controller('sudokuController', function($scope, $http) {
         	}
           }
         }
+       alert(JSON.stringify($scope.illegals));
       	return legal;
       };
       
