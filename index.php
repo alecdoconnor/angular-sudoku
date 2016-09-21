@@ -1,10 +1,20 @@
+<!DOCTYPE html>
 <html>
 <head>
 <title>Sudoku Challenge</title>
+<!-- AngularJS Library -->
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!-- Puzzle Styling -->
 <link rel="stylesheet" type="text/css" href="style/style.css">
+<script>
+window.fadeIn = function(obj) {
+	$(obj).animate({opacity:1},800)
+}
+</script>
 </head>
-<body>
+<body ng-app="sudoku">
 	<!--input below is used to deselect cells after entering a value-->
 <input id="deselectOthers" style="width:0; height:0; position:absolute; left: -100px;"/>
 <div id="intro">
@@ -12,7 +22,7 @@
 <h3>Be the first to beat our classic Sudoku challenge for an all-expenses-paid week-long vacation!</h3>
 </div>
 
-<div id="puzzle" ng-app="sudoku" ng-controller="sudokuController">
+<div id="puzzle" ng-controller="sudokuController" style="opacity:0;">
   <div class="row" ng-repeat="y in puzzle">
     <div class="column  R{{x.row}} C{{x.column}}  B{{((x.column)+1)/3 | number:0}}{{((x.row)+1)/3 | number:0}}" ng-repeat="x in y" ng-click="x.inEdit = true;">
     	<!--static cell-->
@@ -24,7 +34,7 @@
     	<span ng-if="x.editable" ng-hide="x.value == 0 || x.inEdit" ng-bind="x.value" style="color:#2F5B85"></span>
     	<!--Show input cell when activated (clicked on and in focus)-->
     	<input ng-if="x.editable"
-    	style="width: 50px; height: 50px;"
+    	class="inputCell"
     	ng-model="x.value"
     	ng-show="x.inEdit"
     	ng-mouseover="selectInput($event)"
@@ -34,10 +44,25 @@
     </div>
     <div class="clear"></div>
   </div>
-  {{angular.forEach(illegals, function(illegal) {
-    <style ng-repeat="cell in cellRanges | filter:illegal" >.{{cell}} {background-color:#FFEAE9;}</style>
-});}}
+    <style ng-repeat="cell in cellRanges | theIllegals:illegals" >.{{cell}} {background-color:#FFEAE9;}</style>
 </div>
+
+<div style="margin:10px;"></div>
+
+<table id="leaders" ng-show="leaderboards" style="text-align:center;">
+	  <tr>
+	    <th style="width:50%;">Name</th>
+	    <th>Finish Time</th>
+	  </tr>
+	  <tr ng-repeat="individual in leaderboards">
+	  	<td>
+	      {{individual[0]}}
+	    </td>
+	    <td>
+	      {{individual[1] | date:medium}}
+	    </td>
+	  </tr>
+</table>
 
 <div id="rules">
 <p>The classic sudoku game involves a grid of 81 squares. The grid is divided into nine blocks, each containing nine squares.</p>
@@ -46,160 +71,5 @@
 <p>Every puzzle has just one correct solution.</p>
 </div>
 
-<script>
-var app = angular.module('sudoku', []);
-app.controller('sudokuController', function($scope, $http) {
-    $http.get("generator.php").then(
-    function (response) {
-      $scope.puzzle = response.data;
-      $scope.illegals = [];
-      //Normally I would not recommend hard-coding, but running a loop for this would be more trouble than needed
-      $scope.cellRanges = ["R1","R2","R3","R4","R5","R6","R7","R8","R9",
-                           "C1","C2","C3","C4","C5","C6","C7","C8","C9",
-                           "B11","B12","B13","B21","B22","B23","B31","B32","B33"];
-      
-      $scope.selectInput = function($event) {
-      	$event.target.select();
-      };
-      
-      $scope.deselectInput = function() {
-      	document.getElementById("deselectOthers").select();
-      };
-      
-      $scope.validEntry = function(value,y,x) {
-      	if ((value > 0) && (value < 10) && (value % 1 === 0)) {
-          //legal input
-            //Do we need to test for anything here?
-        }
-        else {
-        	//illegal input
-          $scope.puzzle[y-1][x-1].value = 0;
-        }
-        $scope.puzzle[y-1][x-1].inEdit = false;
-      }
-      
-      $scope.checkGame = function() {
-      	if ($scope.movesLeft()) {
-      		//notify of legal cells
-      		$scope.checkLegalCells();
-      	}
-      	else {
-      		//game finished if all legal
-      		if (checkLegalCells()) {
-              //win
-              saveWin();
-              alert("WIN!");
-            }
-      	}
-      };
-      
-      $scope.movesLeft = function() {
-      	var anyLeft = false;
-      	angular.forEach($scope.puzzle, function(yrow) {
-          angular.forEach(yrow, function(xcell) {
-          	//check every row here
-          	if (xcell.value == 0) {
-          		anyLeft = true;
-          	}
-          });
-        });
-      	return anyLeft;
-      }
-      
-      $scope.checkLegalCells = function() {
-      	var legal = true;
-      	$scope.illegals = [];
-      	//rows
-      	angular.forEach($scope.puzzle, function(yrow) {
-      		var row = [];
-          angular.forEach(yrow, function(xcell) {
-          	//check every row here
-          	if (xcell.value > 0) {
-          		row.push(xcell.value);
-          	}
-          });
-          if ($scope.checkDuplicates(row)) {
-          	//this row is invalid
-          	legal = false;
-          	$scope.illegals.push("R" + yrow[0].row);
-          	//adjust css to red border
-          }
-          else {
-          	//valid row
-          	//adjust css to black border
-          }
-        });
-
-        
-        //columns
-        for (var i = 0; i < 9; i++) {
-          var column = [];
-          angular.forEach($scope.puzzle, function(yrow) {
-          	if (yrow[i].value > 0) {
-          	  column.push(yrow[i].value);
-          	}
-          });
-          if ($scope.checkDuplicates(column)) {
-          	//this column is invalid
-          	legal = false;
-          	$scope.illegals.push("C" + (i+1));
-          	//adjust css to red border
-          }
-          else {
-          	//valid column
-          	//adjust css to black border
-          }
-        }
-        
-        
-        //check 3x3 boxes
-        for (var xx = 0;xx < 3;xx++) {
-          for (var yy = 0;yy < 3;yy++) {
-          	//one of nine cell blocks
-        	var box = [];
-        	for (var i = 0;i < 3;i++) {
-        	  for (var j = 0;j < 3; j++) {
-        	  	//one cell in a cell block
-        	  	var puzx = (xx*3)+i;
-        	  	var puzy = (yy*3)+j;
-        	  	var val = $scope.puzzle[puzy][puzx].value;
-        	  	if (val != 0) {
-        	  	  box.push(val);
-        	  	}
-        	  }
-        	}
-        	if ($scope.checkDuplicates(box)) {
-        	  //this column is invalid
-          	  legal = false;
-          	  $scope.illegals.push("B" + (xx+1) + (yy+1))
-          	  //adjust css to red border
-            }
-            else {
-          	  //valid column
-          	  //adjust css to black border
-        	}
-          }
-        }
-       alert(JSON.stringify($scope.illegals));
-      	return legal;
-      };
-      
-      $scope.checkDuplicates = function(arrayVals) {
-        arrayVals.sort();
-        for (var i=0; i<arrayVals.length-1; i++) {
-          if (arrayVals[i+1] == arrayVals[i]) {
-            return true;
-          }
-        }
-        return false;
-      };
-      
-      $scope.saveWin = function() {
-      	
-      }
-      
-      
-    });
-});
-</script>
+<script src="script/puzzle.js"></script>
 </body>

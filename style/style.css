@@ -1,6 +1,6 @@
 body {
-  bbackground: linear-gradient(to bottom right, #0FBA8D,#1FC8DB,#3BA1C1);
-  background: linear-gradient(to bottom right, #87E0FD 0%,#53CBF1 40%,#05ABE0 100%);
+  background: linear-gradient(to bottom right, #BAEEFF 0%,#87E0FD 20%,#23BAEB 65%,#053EE0 100%);
+  font-family: sans-serif;
 }
 
 #puzzle {
@@ -44,6 +44,13 @@ body {
   padding:auto;
 }
 
+.inputCell {
+	width: 50px;
+	height: 50px;
+	padding: 0;
+	border: 0;
+}
+
 h1, h3 {
   width: 600px;
   text-align:center;
@@ -52,6 +59,36 @@ h1, h3 {
 }
 #intro {
   margin:60px;
+}
+table {
+	width: 450px;
+	margin: auto;
+	margin-top: 30px;
+	border-collapse: collapse;
+}
+th, td {
+	text-align: center;
+}
+th {
+	background-color: #1E90FF;
+	color: #FFF;
+	font-size: 1.3em;
+}
+tr {
+	background-color: #FFF;
+	border-bottom: 1px solid #DDD;
+}
+tr:nth-child(2) {
+	font-weight: bold;
+}
+tr:hover {
+	background-color: #F5F5F5;
+}
+.tableHeader {
+	
+}
+.tableRow {
+	
 }
 #rules {
   width: 600px;
